@@ -1,14 +1,13 @@
-Role Name
+Podman Setup
 =========
 
-A brief description of the role goes here.
+A quick, basic setup of your server
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
-
-ansible.posix collection
+- `containers.podman`
+- `ansible.posix collection`
 
 Role Variables
 --------------
@@ -23,18 +22,28 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
     - hosts: servers
+      gather_facts: true
+      vars:
+        users:
+          - name: username
+            password: <your_password_hash> # [learn more](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html#parameter-password)
+            groups:
+              - ssh
+              - wheel
       roles:
-         - { role: username.rolename, x: 42 }
+        - pfruck.server.setup
 
 License
 -------
 
-BSD
+GPL-3.0
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+This role was created in 2022 by [Philipp Fruck](p-fruck.eu).
+
+#### Maintainer(s)
+
+- [Philipp Fruck](https://github.com/p-fruck)
