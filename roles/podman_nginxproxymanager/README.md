@@ -1,12 +1,12 @@
-Role Name
+Podman NginxProxyManager
 =========
 
-A brief description of the role goes here.
+Setup NginxProxyManager using Podman
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- `containers.podman`
 
 Role Variables
 --------------
@@ -21,18 +21,20 @@ A list of other roles hosted on Galaxy should go here, plus any details in regar
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
+         - pfruck.server.nginxproxymanager
 
 License
 -------
 
-BSD
+GPL-3.0
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+This role was created in 2022 by [Philipp Fruck](p-fruck.eu).
+
+#### Maintainer(s)
+
+- [Philipp Fruck](https://github.com/p-fruck)
