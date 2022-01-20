@@ -1,0 +1,45 @@
+---
+# tasks file for setup
+- name: Install required packages
+  ansible.builtin.package:
+    name: "{{ packages }}"
+    state: present
+  become: true
+
+- name: Enable SELinux
+  ansible.posix.selinux:
+    policy: targeted
+    state: enforcing
+
+- name: Configure firewalld
+  ansible.builtin.include_tasks: firewalld.yml
+
+- name: Enable binding to all ports from 80 and upwards as non-root user
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: 80
+    state: present
+  become: true
+
+- name: Ensure all primary groups exist
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ users | map(attribute='name') | list }}"
+  become: true
+
+- name: Ensure all secondary groups exist
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ users | map(attribute='groups') | list | flatten | unique }}"
+  become: true
+
+- name: Configure users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    group: "{{ item.name }}" # set primary user group
+    groups: "{{ item.groups }}" # set secondary user groups
+    password: "{{ item.password }}"
+  loop: "{{ users }}"
+  become: true

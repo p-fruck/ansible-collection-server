@@ -1,0 +1,13 @@
+---
+# defaults file for setup
+packages:
+  - podman
+  - firewalld
+
+firewall:
+  services:
+    - http
+    - https
+    - ssh
+  ports: []
+  rich_rules: []

@@ -1,0 +1,66 @@
+---
+- name: Gather information about active zones
+  ansible.posix.firewalld_info:
+    zones: public
+  register: firewalld_info
+  become: true
+
+- name: Enable given firewall services
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop: "{{ firewall.services }}"
+  become: true
+
+- name: Disable other firewall services
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: disabled
+  loop: "{{ firewalld_info.firewalld_info.zones.public.services }}"
+  when: item not in firewall.services
+  become: true
+
+- name: Enable given firewall ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop: "{{ firewall.ports }}"
+  become: true
+
+- name: Disable other firewall ports
+  ansible.posix.firewalld:
+    port: "{{ item | join('/') }}"
+    permanent: yes
+    state: disabled
+  loop: "{{ firewalld_info.firewalld_info.zones.public.ports }}"
+  when: item | join('/') not in firewall.ports
+  become: true
+
+- name:  Enable given rich rules
+  ansible.posix.firewalld:
+    rich_rule: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  loop: "{{ firewall.rich_rules }}"
+  become: true
+
+- name:  Disable other rich rules
+  ansible.posix.firewalld:
+    rich_rule: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: disabled
+  loop: "{{ firewalld_info.firewalld_info.zones.public.rich_rules }}"
+  when: item not in firewall.rich_rules
+  become: true
+
+- name: Restart and enable firewalld
+  ansible.builtin.service:
+    name: firewalld
+    enabled: yes
+    state: restarted
+  become: true
