@@ -1,4 +1,4 @@
-Podman Setup
+Setup
 =========
 
 A quick, basic setup of your server
@@ -6,7 +6,6 @@ A quick, basic setup of your server
 Requirements
 ------------
 
-- `containers.podman`
 - `ansible.posix collection`
 
 Role Variables
