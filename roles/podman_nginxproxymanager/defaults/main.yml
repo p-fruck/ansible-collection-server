@@ -1,0 +1,15 @@
+---
+# defaults file for podman_nginxproxymanager
+proxy_dir: /srv/proxy
+proxy_log_dir: "{{ proxy_dir }}/logs"
+proxy_volumes:
+  - "{{ proxy_dir }}/data:/data:Z"
+  - "{{ proxy_dir }}/letsencrypt:/etc/letsencrypt:z"
+
+proxy_version: latest
+proxy_image: "jc21/nginx-proxy-manager:{{ proxy_version }}"
+proxy_netẃork: shared_proxy
+
+nginx_redirect_config: "{{ proxy_dir }}/redirect.conf:/etc/nginx/conf.d/default.conf:ro,Z"
+nginx_redirect_version: latest
+nginx_redirect_image: "nginx:{{ nginx_redirect_version }}"
