@@ -12,46 +12,24 @@
     - "{{ proxy_log_dir }}"
   become: true
 
-- name: Create redirect config
-  ansible.builtin.copy:
-    dest: "{{ nginx_redirect_config.split(':')[0] }}"
-    content: |
-      server {
-          listen 80 default_server;
-          listen [::]:80 default_server;
-          server_name _;
-          return 301 https://$host$request_uri;
-      }
-    mode: "0660"
-
 - name: Make sure proxy network exist
   containers.podman.podman_network:
     name: "{{ proxy_network }}"
 
-- name: Define containers
-  containers.podman.podman_containers:
-    containers:
-      - name: proxy_redirect
-        image: "{{ nginx_redirect_image }}"
-        ports:
-          - 80:80
-        volumes:
-          - "{{ nginx_redirect_config }}"
-        log_opt:
-          max_size: 100mb
-          path: "{{ proxy_log_dir }}/redirect.log"
-
-      - name: proxy_app
-        image: "{{ proxy_image }}"
-        ports:
-          - 443:443
-          - 8181:81
-        network:
-          - "{{ proxy_network }}"
-        env:
-          DISABLE_IPV6: 'false'
-          DB_SQLITE_FILE: "/data/nginxproxymanager.sqlite"
-        volumes: "{{ proxy_volumes }}"
-        log_opt:
-          max_size: 100mb
-          path: "{{ proxy_log_dir }}/proxy.log"
+- name: Define proxy container
+  containers.podman.podman_container:
+    name: proxy_app
+    image: "{{ proxy_image }}"
+    ports:
+      - 80:80
+      - 443:443
+      - 8181:81
+    network:
+      - "{{ proxy_network }}"
+    env:
+      DISABLE_IPV6: 'false'
+      DB_SQLITE_FILE: "/data/nginxproxymanager.sqlite"
+    volumes: "{{ proxy_volumes }}"
+    log_opt:
+      max_size: 100mb
+      path: "{{ proxy_log_dir }}/proxy.log"
