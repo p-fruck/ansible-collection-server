@@ -24,6 +24,10 @@
       }
     mode: "0660"
 
+- name: Make sure proxy network exist
+  containers.podman.podman_network:
+    name: "{{ proxy_network }}"
+
 - name: Define containers
   containers.podman.podman_containers:
     containers:
@@ -42,6 +46,8 @@
         ports:
           - 443:443
           - 8181:81
+        network:
+          - "{{ proxy_network }}"
         env:
           DISABLE_IPV6: 'false'
           DB_SQLITE_FILE: "/data/nginxproxymanager.sqlite"

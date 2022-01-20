@@ -1,4 +1,19 @@
 ---
+- name: Make sure firewalld is started and enabled
+  ansible.builtin.service:
+    name: firewalld
+    enabled: yes
+    state: started
+  become: true
+
+# todo: handler
+- name: Restart and enable firewalld
+  ansible.builtin.service:
+    name: firewalld
+    enabled: yes
+    state: restarted
+  become: true
+
 - name: Gather information about active zones
   ansible.posix.firewalld_info:
     zones: public
@@ -58,9 +73,8 @@
   when: item not in firewall.rich_rules
   become: true
 
-- name: Restart and enable firewalld
+- name: Restart firewalld to apply changes
   ansible.builtin.service:
     name: firewalld
-    enabled: yes
     state: restarted
   become: true

@@ -1,8 +1,11 @@
 ---
 # defaults file for setup
 packages:
-  - podman
   - firewalld
+  - podman
+  - podman-plugins
+
+users: []
 
 firewall:
   services:

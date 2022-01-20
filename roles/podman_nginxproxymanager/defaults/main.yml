@@ -8,7 +8,7 @@ proxy_volumes:
 
 proxy_version: latest
 proxy_image: "jc21/nginx-proxy-manager:{{ proxy_version }}"
-proxy_netẃork: shared_proxy
+proxy_network: shared_proxy
 
 nginx_redirect_config: "{{ proxy_dir }}/redirect.conf:/etc/nginx/conf.d/default.conf:ro,Z"
 nginx_redirect_version: latest
