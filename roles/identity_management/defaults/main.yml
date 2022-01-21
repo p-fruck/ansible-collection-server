@@ -1,0 +1,16 @@
+---
+# defaults file for podman_keycloak
+keycloak_dir: "/src/keycloak"
+keycloak_log_dir: "{{ keycloak_dir }}/logs"
+keycloak_volumes: []
+
+keycloak_version: "16.1.0"
+keycloak_image: "quay.io/keycloak/keycloak:{{ keycloak_version }}"
+
+ds_stream: next # choose between next, stable, testing or specific version of 389ds
+ds_root_password: Directory_Manager_Password
+ds_instance_name: localhost
+ds_suffix: "dc=example,dc=com"
+ds_ldapi: "/run/slapd-{{ ds_instance_name }}.socket"
+
+proxy_network: shared_proxy

@@ -1,0 +1,20 @@
+---
+- name: Create temporary config file
+  ansible.builtin.tempfile:
+    state: file
+    suffix: dirsrv
+  register: configfile
+
+- name: Copy template into config file
+  ansible.builtin.template:
+    src: 389ds.inf.j2
+    dest: "{{ configfile.path }}"
+
+- name: Create ds instance
+  ansible.builtin.command: "dscreate from-file {{ configfile.path }}"
+  become: true
+
+- name: Remove config file
+  ansible.builtin.file:
+    path: "{{ configfile.path }}"
+    state: absent

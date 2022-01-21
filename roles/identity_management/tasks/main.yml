@@ -1,0 +1,64 @@
+---
+# tasks file for podman_keycloak
+- name: Enable 389-ds module for dnf
+  ansible.builtin.command: "dnf module enable -y 389-directory-server:{{ ds_stream }}"
+  become: true
+
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+      - 389-ds-base
+      - cockpit-389-ds
+    state: latest
+  become: true
+
+- name: Check if instance socket exists
+  ansible.builtin.stat:
+    path: "{{ ds_ldapi }}"
+  register: ds_instance_socket
+
+- ansible.builtin.include_tasks:
+    file: "create_ds_instance.yml"
+  when: not ds_instance_socket.stat.exists
+
+- name: Make sure cockpit is started and enabled
+  ansible.builtin.service:
+    name: cockpit
+    enabled: yes
+    state: started
+  become: true
+
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    name: "{{ item.split(':')[0] }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "0770"
+  with_items: # flattens keycloak_volumes
+    - "{{ keycloak_volumes }}"
+    - "{{ keycloak_log_dir }}"
+  become: true
+
+- name: Make sure podman networks exist
+  containers.podman.podman_network:
+    name: "{{ proxy_network }}"
+
+- name: Define containers
+  containers.podman.podman_containers:
+    containers:
+      - name: keycloak
+        image: "{{ keycloak_image }}"
+        restart_policy: always
+        ports:
+          - 8080:8080
+        volumes: "{{ keycloak_volumes }}"
+        network:
+          - "{{ proxy_network }}"
+        env:
+          KEYCLOAK_USER: admin
+          KEYCLOAK_PASSWORD: admin
+
+        log_opt:
+          max_size: 100mb
+          path: "{{ keycloak_log_dir }}/keycloak.log"
