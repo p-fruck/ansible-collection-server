@@ -1,5 +1,11 @@
 ---
 # tasks file for setup
+- name: configure epel-release
+  ansible.builtin.package:
+    name: epel-release
+    state: "{{ 'present' if use_epel else absent }}"
+  become: true
+
 - name: Install required packages
   ansible.builtin.package:
     name: "{{ packages }}"

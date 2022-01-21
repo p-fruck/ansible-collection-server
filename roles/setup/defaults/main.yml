@@ -1,9 +1,16 @@
 ---
 # defaults file for setup
+use_epel: true
+
 packages:
+  - cockpit
+  - cockpit-podman
   - firewalld
+  - htop
+  - nano
   - podman
   - podman-plugins
+  - wget
 
 users: []
 
