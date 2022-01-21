@@ -6,7 +6,7 @@ A quick, basic setup of your server
 Requirements
 ------------
 
-- `ansible.posix collection`
+- `ansible.posix`
 
 Role Variables
 --------------

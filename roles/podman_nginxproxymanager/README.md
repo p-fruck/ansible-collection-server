@@ -23,7 +23,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - pfruck.server.nginxproxymanager
+         - pfruck.server.podman_nginxproxymanager
 
 License
 -------
