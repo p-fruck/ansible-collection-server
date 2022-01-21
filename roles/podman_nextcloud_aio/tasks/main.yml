@@ -1,0 +1,43 @@
+---
+# tasks file for podman_nextcloud_aio
+- name: Ensure required directories are present
+  ansible.builtin.file:
+    name: "{{ item.split(':')[0] }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
+    mode: "0770"
+  with_items: # flattens proxy_volumes
+    - "{{ nextcloud_aio_volumes }}"
+  become: true
+
+- name: Ensure podman socket is enabled
+  ansible.builtin.service:
+    name: podman
+    enabled: yes
+    state: started
+
+- name: Define nextcloud aio master container
+  containers.podman.podman_container:
+    name: "{{ container_name }}"
+    cmd_args:
+      - "--security-opt label=disable" # required to bind to podman socket because of selinux
+    restart_policy: always
+    ports:
+      - 8080:8080 # master container interface
+      - 3478:3478 # nextcloud talk
+    volume: "{{ nextcloud_aio_volumes }}"
+    network:
+      - "{{ proxy_network }}"
+    log_opt:
+      max_size: 100mb
+      path: "{{ nextcloud_aio_dir }}/mastercontainer.log"
+
+- name: Run occ config commands
+  ansible.builtin.command: "podman exec -it {{ container_name }} php occ config:system:set {{ item }}"
+  loop:
+    - "default_phone_region --value={{ nextcloud_settings.default_phone_region }}"
+
+- name: Install nextcloud apps
+  ansible.builtin.command: "podman exec -it {{ container_name }} php occ app:install {{ item }}"
+  loop: "{{ nextcloud_apps }}"

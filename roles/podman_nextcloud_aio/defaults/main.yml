@@ -1,0 +1,25 @@
+---
+# defaults file for podman_nextcloud_aio
+nextcloud_aio_dir: /srv/nextcloud
+nextcloud_aio_volumes:
+  - "{{ nextcloud_aio_dir }}/mastercontainer:/mnt/docker-aio-config:Z"
+  - "/run/user/{{ ansible_user_uid }}/podman/podman.sock:/var/run/docker.sock:ro:z"
+
+nextcloud_aio_version: latest
+nextcloud_aio_image: "nextcloud/all-in-one:{{ nextcloud_aio_version }}"
+
+nextcloud_settings:
+  default_phone_region: DE # prevent warnings after initial install
+
+nextcloud_apps:
+  - bookmarks
+  - calendar
+  - circles
+  - collectives
+  - contacts
+  - drawio
+  - forms
+  - news
+  - notes
+  - passwords
+  - spreed

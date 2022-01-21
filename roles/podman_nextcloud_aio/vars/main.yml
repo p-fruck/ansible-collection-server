@@ -1,0 +1,3 @@
+---
+# vars file for podman_nextcloud_aio
+container_name: nextcloud-aio-mastercontainer
