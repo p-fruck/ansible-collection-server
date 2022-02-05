@@ -1,0 +1,3 @@
+[submodule "roles/security"]
+	path = roles/security
+	url = https://github.com/p-fruck/ansible-role-security
