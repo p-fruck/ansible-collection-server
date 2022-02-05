@@ -1,6 +1,6 @@
 ---
 # defaults file for podman_keycloak
-keycloak_dir: "/src/keycloak"
+keycloak_dir: "/srv/keycloak"
 keycloak_log_dir: "{{ keycloak_dir }}/logs"
 keycloak_volumes: []
 
