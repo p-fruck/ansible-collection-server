@@ -25,7 +25,7 @@
     service: "{{ item }}"
     permanent: yes
     state: enabled
-  loop: "{{ firewall.services }}"
+  loop: "{{ firewall_services }}"
   become: true
 
 - name: Disable other firewall services
@@ -34,7 +34,7 @@
     permanent: yes
     state: disabled
   loop: "{{ firewalld_info.firewalld_info.zones.public.services }}"
-  when: item not in firewall.services
+  when: item not in firewall_services
   become: true
 
 - name: Enable given firewall ports
@@ -42,7 +42,7 @@
     port: "{{ item }}"
     permanent: yes
     state: enabled
-  loop: "{{ firewall.ports }}"
+  loop: "{{ firewall_ports }}"
   become: true
 
 - name: Disable other firewall ports
@@ -51,8 +51,19 @@
     permanent: yes
     state: disabled
   loop: "{{ firewalld_info.firewalld_info.zones.public.ports }}"
-  when: item | join('/') not in firewall.ports
+  when: item | join('/') not in firewall_ports
   become: true
+
+- name: "Create firewalld rich rules from given ports to forward"
+  set_fact:
+    forward_rules: "{{ (forward_rules | default([])) + [
+      'rule family=\"ipv4\" forward-port port=\"'
+        + (item | string)
+        + '\" protocol=\"tcp\" to-port=\"'
+        + ((firewall_forward_ports_offset + item) | string)
+        + '\"'
+    ] }}"
+  with_items: "{{ firewall_forward_ports }}"
 
 - name:  Enable given rich rules
   ansible.posix.firewalld:
@@ -60,7 +71,7 @@
     permanent: yes
     immediate: yes
     state: enabled
-  loop: "{{ firewall.rich_rules }}"
+  loop: "{{ forward_rules }}"
   become: true
 
 - name:  Disable other rich rules
@@ -70,7 +81,7 @@
     immediate: yes
     state: disabled
   loop: "{{ firewalld_info.firewalld_info.zones.public.rich_rules }}"
-  when: item not in firewall.rich_rules
+  when: item not in forward_rules
   become: true
 
 - name: Restart firewalld to apply changes

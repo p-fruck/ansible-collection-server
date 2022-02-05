@@ -1,9 +1,12 @@
 ---
 # defaults file for setup
-use_epel: true
 
-packages:
-  - cockpit
+? use_epel # Enable/Disable the Extra Packages for Enterprise Linux (EPEL)
+: true
+
+
+? packages # Packages to install during setup
+: - cockpit
   - cockpit-podman
   - firewalld
   - htop
@@ -12,12 +15,44 @@ packages:
   - podman-plugins
   - wget
 
-users: []
 
-firewall:
-  services:
-    - http
-    - https
-    - ssh
-  ports: []
-  rich_rules: []
+? users # A list of users to create. Each user is an object of the form:
+# ```yaml
+# - name: username
+#   password: `pw_hash`
+#   groups:
+#     - ssh
+#     - wheel
+# ```
+: []
+
+
+? firewall_services # A list of services to open in the firewall. Example:
+# ```yaml
+# firewall_services:
+#   - http
+#   - https
+#   - ssh
+# ```
+: []
+
+
+? firewall_ports # A list of ports to open in the firewall. Example:
+# ```yaml
+# firewall_ports: [ 8080, 8443 ]
+# ```
+: []
+
+
+? firewall_forward_ports # A list of ports to forward with the given offset.
+# This comes in useful if you want to expose an unprivileged service on a privileged port.
+: []
+
+
+? firewall_forward_ports_offset # The offset to forward ports specified in `firewall_forward_ports`. # Example:
+# ```yaml
+# firewall_forward_ports: [ 80, 443 ]
+# firewall_forward_ports_offset: 10000
+# ```
+# This config will redirect the privileged port 80 to the unprivileged port 10080 as well as 443 to 10443.
+: 10000
